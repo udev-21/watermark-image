@@ -146,6 +146,9 @@ let loadLogo = function (event) {
         logo.height = logoHeight;
         logoOriginWidth = logoWidth;
         logoOriginHeight = logoHeight;
+
+        let logoscale = document.getElementById('logoscale');
+        logoscale.value = "100";
     }
 };
 
@@ -173,15 +176,24 @@ let onButtonClick = function (event) {
         method: 'post',
         body: formData
     }).then(res => res.blob()).then(blob => {
+        let m = new Date();
+        let dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + "_" + m.getUTCHours() + "_" + m.getUTCMinutes() + "_" + m.getUTCSeconds();
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'image.jpeg';
+        if (backgroundFile.type == "image/png") {
+            a.download = "image_" + dateString + ".png";
+        } else {
+            a.download = "image_" + dateString + ".jpeg";
+        }
         a.click();
     }).catch(err => alert(err))
 
 }
 
 let onReset = function (event) {
+    logoFile = undefined
+    backgroundFile = undefined
+
     scale = 1
     logoOriginHeight = 0
     logoOriginWidth = 0
@@ -199,7 +211,6 @@ let onReset = function (event) {
 }
 
 let onChangeLogoScale = function (event) {
-    console.log(logoOriginHeight, logoOriginWidth)
     let re = /^[0-9]+$/;
     if (!re.test(event.target.value)) {
         event.target.value = "100"
