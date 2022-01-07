@@ -15,10 +15,11 @@
 
     </div>
     <label for="backgroundFile">Image</label>
-    <input id="backgroundFile" name="image" type="file" accept="image/*" onchange="loadBackground(event)">
+    <input id="backgroundFile" name="image" type="file" accept="image/jpeg,image/jpg,image/png"
+        onchange="loadBackground(event)">
     <br>
     <label for="logofile">logo</label>
-    <input id="logofile" name="logo" type="file" accept="image/*" onchange="loadLogo(event)">
+    <input id="logofile" name="logo" type="file" accept="image/png" onchange="loadLogo(event)">
     <input id="posx" type="hidden" name="logox">
     <input id="posy" type="hidden" name="logoy">
     <br>
