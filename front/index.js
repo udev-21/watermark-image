@@ -15,17 +15,22 @@ window.mobileAndTabletCheck = function () {
 
 function init() {
     let container = document.createElement('img');
+    let wrapper = document.getElementById('wrapper')
     container.classList.add('container');
     container.id = 'background'
     container.draggable = false
+    container.style.margin = "0"
 
     let logo = document.createElement("img")
     logo.id = "logo"
-    logo.style.position = 'absolute';
+    logo.style.position = 'fixed';
+    logo.style.top = "0"
+    logo.style.left = "0"
     logo.style.opacity = "0.5"
+    logo.style.margin = "0"
 
-    document.getElementById('wrapper').appendChild(container);
-    document.getElementById('wrapper').appendChild(logo);
+    wrapper.appendChild(container);
+    wrapper.appendChild(logo);
 }
 init()
 doStuff()
@@ -162,7 +167,12 @@ let onButtonClick = function (event) {
         alert("The logo is not in the background")
         return
     }
-
+    let body = document.getElementById("body")
+    document.getElementById("wrapper").classList.add("blurred")
+    let loading = document.createElement('div')
+    loading.classList.add('loading-wrapper')
+    loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`
+    body.appendChild(loading)
     let formData = new FormData();
     let logoscale = document.getElementById('logoscale');
     logoY = (logoTmp.top - backgroundTmp.top) / scale
@@ -186,6 +196,8 @@ let onButtonClick = function (event) {
             a.download = "image_" + dateString + ".jpeg";
         }
         a.click();
+        document.getElementById("wrapper").classList.remove("blurred")
+        loading.remove()
     }).catch(err => alert(err))
 
 }
