@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <div id="wrapper">
+
+    </div>
+    <input name="image" type="file" accept="image/*" onchange="loadBackground(event)">
+    <input name="logo" type="file" accept="image/*" onchange="loadLogo(event)">
+    <input id="posx" type="hidden" name="logox">
+    <input id="posy" type="hidden" name="logoy">
+    <input name="logoscale" id="logoscale" onkeyup="onChangeLogoScale(event)" value="100">
+
+    <button onclick="onButtonClick(event)">click when ready</button>
+    <button onclick="onReset(event)">reset</button>
+    <div id="result"></div>
+    <script src="index.js"></script>
+</body>
+
+</html>
