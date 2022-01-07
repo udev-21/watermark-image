@@ -14,15 +14,21 @@
     <div id="wrapper">
 
     </div>
-    <input name="image" type="file" accept="image/*" onchange="loadBackground(event)">
-    <input name="logo" type="file" accept="image/*" onchange="loadLogo(event)">
+    <label for="backgroundFile">Image</label>
+    <input id="backgroundFile" name="image" type="file" accept="image/*" onchange="loadBackground(event)">
+    <br>
+    <label for="logofile">logo</label>
+    <input id="logofile" name="logo" type="file" accept="image/*" onchange="loadLogo(event)">
     <input id="posx" type="hidden" name="logox">
     <input id="posy" type="hidden" name="logoy">
+    <br>
+    <label for="logoscale">logoscale</label>
     <input name="logoscale" id="logoscale" onkeyup="onChangeLogoScale(event)" value="100">
-
-    <button onclick="onButtonClick(event)">click when ready</button>
-    <button onclick="onReset(event)">reset</button>
-    <div id="result"></div>
+    <br>
+    <div class="buttons">
+        <button onclick="onButtonClick(event)" class="button-15 action_btn">Submit</button>
+        <button onclick="onReset(event)" class="button-15 redcolor action_btn">Reset</button>
+    </div>
     <script src="index.js"></script>
 </body>
 
