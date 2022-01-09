@@ -36,7 +36,6 @@ function doStuff() {
         logo.classList.add('bordered')
         background.classList.add('bordered')
 
-
         let shiftX = event.clientX - logo.getBoundingClientRect().left;
         let shiftY = event.clientY - logo.getBoundingClientRect().top;
 
@@ -46,6 +45,19 @@ function doStuff() {
         function moveAt(pageX, pageY) {
             logo.style.left = pageX - shiftX + 'px';
             logo.style.top = pageY - shiftY + 'px';
+
+            if (logo.getBoundingClientRect().right > background.getBoundingClientRect().right) {
+                logo.style.left = background.offsetLeft + background.width - logo.getBoundingClientRect().width + 'px';
+            }
+            if (logo.getBoundingClientRect().left < background.getBoundingClientRect().left) {
+                logo.style.left = background.offsetLeft + 'px';
+            }
+            if (logo.offsetTop + logo.offsetHeight > background.offsetTop + background.offsetHeight) {
+                logo.style.top = background.offsetTop + background.height - logo.height + 'px';
+            }
+            if (logo.offsetTop < background.offsetTop) {
+                logo.style.top = background.offsetTop + 'px';
+            }
         }
 
         moveAt(event.pageX, event.pageY);
@@ -54,12 +66,12 @@ function doStuff() {
             moveAt(event.pageX, event.pageY);
         }
         document.addEventListener('mousemove', onMouseMove);
-        logo.onmouseup = function () {
+        document.addEventListener('mouseup', function () {
             document.removeEventListener('mousemove', onMouseMove);
             logo.classList.remove("bordered")
             background.classList.remove("bordered")
             logo.onmouseup = null;
-        };
+        });
     }
     logo.ontouchstart = function (event) {
 
