@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body id="body" class="noselect">
+    <div id="wrappers" class="wrappers">
+
+    </div>
+    <label for="backgroundFile">Image</label>
+    <input id="backgroundFile" name="image" type="file" accept="image/jpeg,image/jpg,image/png" multiple
+        onchange="loadBackground(event)">
+    <br>
+    <label for="logofile">logo</label>
+    <input id="logofile" name="logo" type="file" accept="image/png" onchange="loadLogo(event)">
+    <br>
+    <label for="logoscale">logoscale</label>
+    <input name="logoscale" id="logoscale" onkeyup="onChangeLogoScale(event)" value="100">
+    <br>
+    <div class="buttons">
+        <button onclick="onButtonClick(event)" class="button-15 action_btn">Submit</button>
+        <button onclick="onReset(event)" class="button-15 redcolor action_btn">Reset</button>
+    </div>
+    <script src="index.js"></script>
+</body>
+
+</html>
