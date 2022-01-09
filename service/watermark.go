@@ -12,9 +12,10 @@ import (
 )
 
 type WatermarkService struct {
-	Image  image.Image
-	Logo   image.Image
-	Offset image.Point
+	Image   image.Image
+	Logo    image.Image
+	Offset  image.Point
+	Opacity uint8
 }
 
 func NewWatermarkService(image, logo image.Image) *WatermarkService {
@@ -35,7 +36,7 @@ func (ir *WatermarkService) ResizeLogo(scale int) {
 func (ir *WatermarkService) MergeLogo() (image.Image, error) {
 
 	//create a mask for make logo transparent 50%
-	mask := image.NewUniform(color.Alpha{128})
+	mask := image.NewUniform(color.Alpha{ir.Opacity})
 
 	//Create a new blank image m
 	m := image.NewRGBA(ir.Image.Bounds())
@@ -63,4 +64,8 @@ func (ir *WatermarkService) SetLogoPosition(position string) error {
 		return errors.New("invalid position")
 	}
 	return nil
+}
+
+func (ir *WatermarkService) SetOpacity(opacity uint8) {
+	ir.Opacity = opacity
 }

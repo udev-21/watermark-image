@@ -18,6 +18,7 @@ type order struct {
 	posX             int
 	posY             int
 	image            image.Image
+	opacity          uint8
 }
 
 func FrontHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,6 +56,8 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 	var scales []string
 	var posXes []string
 	var posYes []string
+	var opacities []string
+
 	var ok bool
 	if scales, ok = formData["scale"]; !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -74,11 +77,17 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{"error": "scales - required"}`)
 		return
 	}
-
-	if !(len(posXes) == len(posYes) && len(posYes) == len(scales)) {
+	if opacities, ok = formData["opacity"]; !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, `{"error": "length of scale and logox and logoy must be same"}`)
+		fmt.Fprintf(w, `{"error": "scales - required"}`)
+		return
+	}
+
+	if !(len(posXes) == len(posYes) && len(posYes) == len(scales) && len(posYes) == len(opacities)) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"error": "length of scale and logox and logoy and opacity must be same"}`)
 		return
 	}
 
@@ -154,6 +163,15 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		order.posY = int(posy)
 		order.imageContentType = imageContentType
+		opacity, err := strconv.ParseInt(opacities[idx], 10, 64)
+		if err != nil || opacity < 1 || opacity > 255 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"error": "opacity required and must be between 1 and 255"}`)
+			return
+		}
+		order.opacity = uint8(opacity)
+
 		orders = append(orders, order)
 		uploadedFile.Close()
 	}
@@ -165,6 +183,7 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 		service := NewWatermarkService(order.image, logo)
 		service.ResizeLogo(order.scale)
 		service.SetOffset(order.posX, order.posY)
+		service.SetOpacity(order.opacity)
 		result, err := service.MergeLogo()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

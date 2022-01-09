@@ -70,6 +70,18 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{"error": "image - must be a jpeg or png image"}`)
 		return
 	}
+	opacityStr := r.FormValue("opacity")
+	if opacityStr == "" {
+		opacityStr = "128"
+	}
+	opacity, err := strconv.ParseInt(opacityStr, 10, 64)
+	if err != nil || opacity < 1 || opacity > 255 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `{"error": "opacity - required and must be between 1 and 255"}`)
+		return
+	}
+
 	scaleStr := r.FormValue("scale")
 	if scaleStr == "" {
 		scaleStr = "100"
@@ -122,6 +134,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	service := service.NewWatermarkService(background, logo)
 	service.ResizeLogo(int(scale))
 	service.SetOffset(int(posX), int(posY))
+	service.SetOpacity(uint8(opacity))
 	if logoPosition != "" {
 		service.SetLogoPosition(logoPosition)
 	}
@@ -136,12 +149,11 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 
 	if imageContentType == "image/jpeg" || imageContentType == "image/jpg" {
 		w.Header().Set("Content-Type", "image/jpeg")
-		jpeg.Encode(w, result, &jpeg.Options{jpeg.DefaultQuality})
+		jpeg.Encode(w, result, &jpeg.Options{Quality: jpeg.DefaultQuality})
 	} else {
 		w.Header().Set("Content-Type", "image/png")
 		png.Encode(w, result)
 	}
-	return
 }
 
 func main() {

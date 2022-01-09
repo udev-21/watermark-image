@@ -22,6 +22,20 @@ function createNewItem(id) {
     wrapper.appendChild(logo);
     wrapper.appendChild(document.createElement("br"));
     wrapper.appendChild(logoscaleLabel);
+
+    let rangeSlider = document.createElement('input');
+    rangeSlider.type = "range";
+    rangeSlider.min = "1";
+    rangeSlider.max = "255";
+    rangeSlider.value = "128";
+    rangeSlider.classList.add("slider");
+    rangeSlider.id = "slider" + id;
+    rangeSlider.classList.add("opacity");
+    rangeSlider.oninput = function () {
+        logo.style.opacity = rangeSlider.value / 256;
+    };
+    wrapper.appendChild(document.createElement("br"));
+    wrapper.appendChild(rangeSlider);
     return wrapper;
 }
 
@@ -110,7 +124,6 @@ let loadLogo = function (event) {
             logo.style.left = background.offsetLeft + 'px';
         }
         logo.onmousedown = function (event) {
-            logo.classList.add('bordered')
 
             let shiftX = event.clientX - logo.getBoundingClientRect().left;
             let shiftY = event.clientY - logo.getBoundingClientRect().top;
@@ -146,7 +159,6 @@ let loadLogo = function (event) {
 
             document.addEventListener('mouseup', function () {
                 document.removeEventListener('mousemove', onMouseMove);
-                logo.classList.remove("bordered");
                 logo.onmouseup = null;
             });
         }
@@ -176,13 +188,6 @@ let loadLogo = function (event) {
 
 
 let onButtonClick = function (event) {
-    let body = document.getElementById("body");
-    document.getElementById("wrappers").classList.add("blurred");
-    let loading = document.createElement('div');
-    loading.classList.add('loading-wrapper');
-    loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
-    body.appendChild(loading);
-
     let formData = new FormData();
 
     let wrappers = document.getElementsByClassName("wrapper")
@@ -199,6 +204,7 @@ let onButtonClick = function (event) {
             logo = background.nextSibling;
             logoscale = logo.nextSibling.nextSibling.lastChild;
         }
+        let opacity = logoscale.parentElement.nextSibling.nextSibling.value;
 
         const logoTmp = logo.getBoundingClientRect();
         const backgroundTmp = background.getBoundingClientRect();
@@ -210,7 +216,15 @@ let onButtonClick = function (event) {
         formData.append('logoy', Math.trunc(logoY));
         formData.append('scale', logoscale.value);
         formData.append('image', backgroundFiles[i]);
+        formData.append('opacity', opacity);
     }
+    let body = document.getElementById("body");
+    body.classList.add("blurred");
+    let loading = document.createElement('div');
+    loading.classList.add('loading-wrapper');
+    loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
+    body.appendChild(loading);
+
     formData.append('logo', logoFile);
     fetch("/watermark-zip", {
         method: 'post',
@@ -222,7 +236,7 @@ let onButtonClick = function (event) {
         a.href = URL.createObjectURL(blob);
         a.download = dateString + ".zip";
         a.click();
-        document.getElementById("wrappers").classList.remove("blurred");
+        body.classList.remove("blurred");
         loading.remove();
     }).catch(err => alert(err));
 }
