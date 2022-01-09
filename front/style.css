@@ -192,3 +192,17 @@ body{
     margin: 0 auto;
     display: inline;
 }
+
+.wrappers {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+}
+
+.wrapper{
+    padding: 1rem;
+}
+
+.noselect::selection {
+    background-color: unset;
+}
