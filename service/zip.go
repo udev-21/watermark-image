@@ -189,7 +189,7 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, `{"error": "can't create new file inside zip: %s"}`, err.Error())
 				return
 			}
-			jpeg.Encode(w1, result, &jpeg.Options{jpeg.DefaultQuality})
+			jpeg.Encode(w1, result, &jpeg.Options{Quality: jpeg.DefaultQuality})
 		}
 
 	}

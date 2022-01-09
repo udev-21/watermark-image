@@ -1,90 +1,5 @@
-let scale = 1
-let logoOriginWidth = 0
-let logoOriginHeight = 0
-let backgroundOriginWidth = 0
-let backgroundOriginHeight = 0
-let logoX = 0
-let logoY = 0
 let logoFile = undefined
 let backgroundFiles = []
-
-function doStuff() {
-    let logo = document.getElementById("logo");
-    let background = document.getElementById("background");
-    logo.onmousedown = function (event) {
-        logo.classList.add('bordered')
-        background.classList.add('bordered')
-
-
-        let shiftX = event.clientX - logo.getBoundingClientRect().left;
-        let shiftY = event.clientY - logo.getBoundingClientRect().top;
-
-        logo.style.position = 'absolute';
-        logo.style.zIndex = 1000;
-        document.body.append(logo);
-        function moveAt(pageX, pageY) {
-            logo.style.left = pageX - shiftX + 'px';
-            logo.style.top = pageY - shiftY + 'px';
-            if (logo.getBoundingClientRect().right > background.getBoundingClientRect().right) {
-                logo.style.left = background.offsetLeft + background.width - logo.getBoundingClientRect().width + 'px';
-            }
-            if (logo.getBoundingClientRect().left < background.getBoundingClientRect().left) {
-                logo.style.left = background.offsetLeft + 'px';
-            }
-            if (logo.offsetTop + logo.offsetHeight > background.offsetTop + background.offsetHeight) {
-                logo.style.top = background.offsetTop + background.height - logo.height + 'px';
-            }
-            if (logo.offsetTop < background.offsetTop) {
-                logo.style.top = background.offsetTop + 'px';
-            }
-        }
-
-        moveAt(event.pageX, event.pageY);
-
-        function onMouseMove(event) {
-            moveAt(event.pageX, event.pageY);
-        }
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', function () {
-            document.removeEventListener('mousemove', onMouseMove);
-            logo.classList.remove("bordered")
-            background.classList.remove("bordered")
-            logo.onmouseup = null;
-        });
-    }
-    logo.ontouchstart = function (event) {
-
-        logo.classList.add('bordered')
-        background.classList.add('bordered')
-
-        let shiftX = event.targetTouches[0].pageX - logo.getBoundingClientRect().left;
-        let shiftY = event.targetTouches[0].pageY - logo.getBoundingClientRect().top;
-        logo.style.position = 'absolute';
-        logo.style.zIndex = 1000;
-        document.body.append(logo);
-
-        function moveAt(pageX, pageY) {
-            logo.style.left = pageX - shiftX + 'px';
-            logo.style.top = pageY - shiftY + 'px';
-        }
-
-        moveAt(event.pageX, event.pageY);
-
-        function onMouseMove(event) {
-            moveAt(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
-        }
-        document.addEventListener('touchmove', onMouseMove);
-        logo.onmouseup = function () {
-            document.removeEventListener('touchmove', onMouseMove);
-            logo.classList.remove("bordered")
-            background.classList.remove("bordered")
-            logo.onmouseup = null;
-        };
-    }
-    logo.ondragstart = function () {
-        return false;
-    };
-}
 
 function createNewItem(id) {
     let wrapper = document.createElement('div')
@@ -94,6 +9,7 @@ function createNewItem(id) {
 
     let logo = new Image()
     logo.style.opacity = "0.5"
+    logo.classList.add("logo")
     logo.style.position = "absolute"
     logo.draggable = false
     logo.id = "logo" + id
@@ -314,30 +230,13 @@ let onButtonClick = function (event) {
 
 let onReset = function (event) {
     logoFile = undefined
-    backgroundFile = undefined
-
-    scale = 1
-    logoOriginHeight = 0
-    logoOriginWidth = 0
-    backgroundOriginHeight = 0
-    backgroundOriginWidth = 0
-    let logo = document.getElementById('logo');
-    let background = document.getElementById('background');
-    let logoscale = document.getElementById('logoscale');
-    logoscale.value = "100"
-    logo.remove()
-    background.remove()
-
-    init()
-    doStuff()
+    backgroundFiles = []
+    removeElementsByClass("wrapper")
+    removeElementsByClass("logo")
 }
-
-let onChangeLogoScale = function (event) {
-    alert('something')
-}
-
-
-let resetLogoScale = function () {
-    let logoscale = document.getElementById('logoscale');
-    logoscale.value = "100"
+function removeElementsByClass(className) {
+    var elements = document.getElementsByClassName(className);
+    while (elements.length > 0) {
+        elements[0].parentNode.removeChild(elements[0]);
+    }
 }
