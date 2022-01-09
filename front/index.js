@@ -1,28 +1,28 @@
-let logoFile = undefined
-let backgroundFiles = []
+let logoFile = undefined;
+let backgroundFiles = [];
 
 function createNewItem(id) {
-    let wrapper = document.createElement('div')
-    wrapper.classList.add("wrapper")
-    let background = new Image()
-    background.draggable = false
+    let wrapper = document.createElement('div');
+    wrapper.classList.add("wrapper");
+    let background = new Image();
+    background.draggable = false;
 
-    let logo = new Image()
-    logo.style.opacity = "0.5"
-    logo.classList.add("logo")
-    logo.style.position = "absolute"
-    logo.draggable = false
-    logo.id = "logo" + id
+    let logo = new Image();
+    logo.style.opacity = "0.5";
+    logo.classList.add("logo");
+    logo.style.position = "absolute";
+    logo.draggable = false;
+    logo.id = "logo" + id;
 
-    let logoscaleLabel = document.createElement('label')
-    let logoscale = document.createElement('input')
-    logoscaleLabel.innerText = "LogoScale "
-    logoscaleLabel.appendChild(logoscale)
-    wrapper.appendChild(background)
-    wrapper.appendChild(logo)
-    wrapper.appendChild(document.createElement("br"))
-    wrapper.appendChild(logoscaleLabel)
-    return wrapper
+    let logoscaleLabel = document.createElement('label');
+    let logoscale = document.createElement('input');
+    logoscaleLabel.innerText = "LogoScale ";
+    logoscaleLabel.appendChild(logoscale);
+    wrapper.appendChild(background);
+    wrapper.appendChild(logo);
+    wrapper.appendChild(document.createElement("br"));
+    wrapper.appendChild(logoscaleLabel);
+    return wrapper;
 }
 
 let loadBackground = function (event) {
@@ -69,14 +69,14 @@ let loadBackground = function (event) {
 let loadLogo = function (event) {
     logoFile = event.target.files[0];
 
-    let wrappers = document.getElementsByClassName("wrapper")
+    let wrappers = document.getElementsByClassName("wrapper");
 
     for (let i = 0; i < wrappers.length; i++) {
         const element = wrappers[i];
         let background = element.firstChild;
         let logo = background.nextSibling;
-        logo.src = URL.createObjectURL(logoFile)
-        let backgroundScale = Math.min(background.height / background.naturalHeight, background.width / background.naturalWidth)
+        logo.src = URL.createObjectURL(logoFile);
+        let backgroundScale = Math.min(background.height / background.naturalHeight, background.width / background.naturalWidth);
         let logoscale = logo.nextSibling.nextSibling.firstChild.nextSibling;
 
         logo.onload = function () {
@@ -146,9 +146,8 @@ let loadLogo = function (event) {
 
             document.addEventListener('mouseup', function () {
                 document.removeEventListener('mousemove', onMouseMove);
-                logo.classList.remove("bordered")
+                logo.classList.remove("bordered");
                 logo.onmouseup = null;
-                console.log(logo.getBoundingClientRect(), background.getBoundingClientRect())
             });
         }
 
@@ -159,15 +158,15 @@ let loadLogo = function (event) {
         logoscale.onchange = function (event) {
             let re = /^[0-9]+$/;
             if (!re.test(event.target.value)) {
-                this.value = this.oldvalue
-                return
+                this.value = this.oldvalue;
+                return;
             }
             if (this.value * logo.naturalWidth / 100 > background.naturalWidth || this.value * logo.naturalHeight / 100 > background.naturalHeight) {
-                alert("invalid value, max value is: " + Math.trunc(Math.min((background.naturalWidth * 100) / logo.naturalWidth, (background.naturalHeight * 100) / logo.naturalHeight)))
-                this.value = this.oldvalue
+                alert("invalid value, max value is: " + Math.trunc(Math.min((background.naturalWidth * 100) / logo.naturalWidth, (background.naturalHeight * 100) / logo.naturalHeight)));
+                this.value = this.oldvalue;
             } else {
-                logo.width = Math.trunc(logo.naturalWidth * backgroundScale * this.value / 100)
-                logo.height = Math.trunc(logo.naturalHeight * backgroundScale * this.value / 100)
+                logo.width = Math.trunc(logo.naturalWidth * backgroundScale * this.value / 100);
+                logo.height = Math.trunc(logo.naturalHeight * backgroundScale * this.value / 100);
             }
             this.oldvalue = this.value;
         }
@@ -177,12 +176,12 @@ let loadLogo = function (event) {
 
 
 let onButtonClick = function (event) {
-    let body = document.getElementById("body")
-    document.getElementById("wrappers").classList.add("blurred")
-    let loading = document.createElement('div')
-    loading.classList.add('loading-wrapper')
-    loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`
-    body.appendChild(loading)
+    let body = document.getElementById("body");
+    document.getElementById("wrappers").classList.add("blurred");
+    let loading = document.createElement('div');
+    loading.classList.add('loading-wrapper');
+    loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
+    body.appendChild(loading);
 
     let formData = new FormData();
 
@@ -190,11 +189,11 @@ let onButtonClick = function (event) {
     for (let i = 0; i < wrappers.length; i++) {
         const wrapper = wrappers[i];
         const background = wrapper.firstChild;
-        const backgroundScale = Math.min(background.height / background.naturalHeight, background.width / background.naturalWidth)
-        let logoscale = undefined
-        let logo = undefined
+        const backgroundScale = Math.min(background.height / background.naturalHeight, background.width / background.naturalWidth);
+        let logoscale = undefined;
+        let logo = undefined;
         if (background.nextSibling.nodeName == "BR") {
-            logo = document.getElementById("logo" + i)
+            logo = document.getElementById("logo" + i);
             logoscale = background.nextSibling.nextSibling.lastChild;
         } else {
             logo = background.nextSibling;
@@ -204,8 +203,8 @@ let onButtonClick = function (event) {
         const logoTmp = logo.getBoundingClientRect();
         const backgroundTmp = background.getBoundingClientRect();
 
-        logoY = (logoTmp.top - backgroundTmp.top) / backgroundScale
-        logoX = (logoTmp.left - backgroundTmp.left) / backgroundScale
+        logoY = (logoTmp.top - backgroundTmp.top) / backgroundScale;
+        logoX = (logoTmp.left - backgroundTmp.left) / backgroundScale;
 
         formData.append('logox', Math.trunc(logoX));
         formData.append('logoy', Math.trunc(logoY));
@@ -221,18 +220,18 @@ let onButtonClick = function (event) {
         let dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + "_" + m.getUTCHours() + "_" + m.getUTCMinutes() + "_" + m.getUTCSeconds();
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = dateString + ".zip"
+        a.download = dateString + ".zip";
         a.click();
-        document.getElementById("wrappers").classList.remove("blurred")
-        loading.remove()
-    }).catch(err => alert(err))
+        document.getElementById("wrappers").classList.remove("blurred");
+        loading.remove();
+    }).catch(err => alert(err));
 }
 
 let onReset = function (event) {
-    logoFile = undefined
-    backgroundFiles = []
-    removeElementsByClass("wrapper")
-    removeElementsByClass("logo")
+    logoFile = undefined;
+    backgroundFiles = [];
+    removeElementsByClass("wrapper");
+    removeElementsByClass("logo");
 }
 function removeElementsByClass(className) {
     var elements = document.getElementsByClassName(className);
