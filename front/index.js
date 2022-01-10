@@ -1,6 +1,13 @@
 let logoFile = undefined;
 let backgroundFiles = [];
 
+const cat = localStorage.getItem('api_key');
+console.log(cat)
+if (cat == "" || cat == null) {
+    let login = document.getElementById("login");
+    login.classList.remove("displaynone");
+}
+
 function createNewItem(id) {
     let wrapper = document.createElement('div');
     wrapper.classList.add("wrapper");
@@ -235,23 +242,39 @@ let onButtonClick = function (event) {
     formData.append('logo', logoFile);
     fetch("/watermark-zip", {
         method: 'post',
-        body: formData
-    }).then(res => res.blob()).then(blob => {
-        let m = new Date();
-        let dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + "_" + m.getUTCHours() + "_" + m.getUTCMinutes() + "_" + m.getUTCSeconds();
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = dateString + ".zip";
-        a.click();
-
-        for (let i = 0; i < logos.length; i++) {
-            const logo = logos[i];
-            logo.classList.remove("blurred");
-            const wrapper = wrappers[i];
-            wrapper.classList.remove("blurred");
+        body: formData,
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('api_key')
         }
-        loading.remove();
-    }).catch(err => alert(err));
+    }).then(res => {
+        if (res.ok) {
+            return res.blob().then(blob => {
+                let m = new Date();
+                let dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + "_" + m.getUTCHours() + "_" + m.getUTCMinutes() + "_" + m.getUTCSeconds();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = dateString + ".zip";
+                a.click();
+
+                for (let i = 0; i < logos.length; i++) {
+                    const logo = logos[i];
+                    logo.classList.remove("blurred");
+                    const wrapper = wrappers[i];
+                    wrapper.classList.remove("blurred");
+                }
+                loading.remove();
+            });
+        } else {
+            alert("Error: " + res.body);
+            for (let i = 0; i < logos.length; i++) {
+                const logo = logos[i];
+                logo.classList.remove("blurred");
+                const wrapper = wrappers[i];
+                wrapper.classList.remove("blurred");
+            }
+            loading.remove();
+        }
+    });
 }
 
 let onReset = function (event) {
@@ -265,4 +288,24 @@ function removeElementsByClass(className) {
     while (elements.length > 0) {
         elements[0].parentNode.removeChild(elements[0]);
     }
+}
+
+function onLogin(event) {
+    let nickname = document.getElementById("nickname").value;
+    let password = document.getElementById("password").value;
+    let formData = new FormData();
+    formData.append('nickname', nickname);
+    formData.append('password', password);
+    let login = document.getElementById("login");
+    fetch("/api/auth", {
+        method: 'post',
+        body: formData
+    }).then(res => {
+        if (res.ok) {
+            login.classList.add("displaynone");
+            localStorage.setItem("api_key", password);
+        } else {
+            alert("wrong nickname or password");
+        }
+    })
 }

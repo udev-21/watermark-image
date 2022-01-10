@@ -5,36 +5,35 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"net/http"
+	"os"
 	"pimage/service"
 	"strconv"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if origin := r.Header.Get("Origin"); origin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-			if r.Method == "OPTIONS" {
-				r.Header.Set("Access-Control-Allow-Methods", "POST")
-				r.Header.Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-				w.Header().Set("Access-Control-Allow-Credentials", "true")
-				w.Header().Set("Access-Control-Max-Age", "86400")
-				w.WriteHeader(http.StatusOK)
-				return
-			} else if r.Method != http.MethodPost {
-				w.WriteHeader(http.StatusMethodNotAllowed)
-				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprintf(w, `{"error": "only post method supported"}`)
-				return
-			}
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"error": "only post method supported"}`)
+			return
+		}
+		if val := r.Header.Get("Authorization"); val != "Bearer "+adminPassword {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"error": "invalid token"}`)
+			return
 		}
 		next(w, r)
 	})
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
-	r.Body.Close()
-
+	defer r.Body.Close()
 	//32 << 20 =  32 MB
 	r.ParseMultipartForm(32 << 20) // limit your max input length!
 
@@ -43,6 +42,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, `{"error": "logo - png file required"}`)
+		fmt.Println(err)
 		return
 	}
 
@@ -159,10 +159,55 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+var (
+	adminNickName, adminPassword, bearerToken, port string
+)
+
 func main() {
+	adminNickName = os.Getenv("ADMIN_NICKNAME")
+	adminPassword = os.Getenv("ADMIN_PASSWORD")
+	bearerToken = os.Getenv("API_BEARER_TOKEN")
+	port = os.Getenv("PORT")
+	if val, err := strconv.Atoi(port); err != nil || val < 1 || val > 65535 {
+		log.Fatalf("given port must be valid, free and must be between 1 and 65535 \n")
+	}
+	if adminNickName == "" || adminPassword == "" || bearerToken == "" {
+		log.Fatalf("ADMIN_NICKNAME, ADMIN_PASSWORD and API_BEARER_TOKEN required\n")
+	}
+
 	fs := http.FileServer(http.Dir("./front"))
 	http.Handle("/", fs)
-	http.HandleFunc("/watermark", corsMiddleware(apiHandler))
+	http.HandleFunc("/api/watermark", apiMiddleware(apiHandler))
+	http.HandleFunc("/api/auth", authHandler)
 	http.HandleFunc("/watermark-zip", corsMiddleware(service.FrontHandler))
-	http.ListenAndServe(":8080", nil)
+	log.Printf("trying to init server on port %s\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatal("can't start server: ", err)
+	}
+}
+
+func apiMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		if token := r.Header.Get("Authorization"); token != "Bearer "+bearerToken {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("invalid token"))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func authHandler(w http.ResponseWriter, r *http.Request) {
+	nickname := r.FormValue("nickname")
+	password := r.FormValue("password")
+	if nickname == adminNickName && password == adminPassword {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("invalid credentials"))
+	}
 }
