@@ -7,12 +7,13 @@ body{
 }
 
 .lds-roller {
-    display: inline-block;
-    position: relative;
+    filter: none;
+    display: block;
+    position: fixed;
     width: 80px;
     height: 80px;
-    margin-top: 20%;
-    margin-left: 50%;
+    top: 200px;
+    left: calc(50% - 40px);
 }
 
 .lds-roller div {

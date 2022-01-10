@@ -217,9 +217,16 @@ let onButtonClick = function (event) {
         formData.append('scale', logoscale.value);
         formData.append('image', backgroundFiles[i]);
         formData.append('opacity', opacity);
+        wrapper.classList.add("blurred");
     }
+
+    const logos = document.getElementsByClassName("logo");
+    for (let i = 0; i < logos.length; i++) {
+        const logo = logos[i];
+        logo.classList.add("blurred");
+    }
+
     let body = document.getElementById("body");
-    body.classList.add("blurred");
     let loading = document.createElement('div');
     loading.classList.add('loading-wrapper');
     loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
@@ -236,7 +243,13 @@ let onButtonClick = function (event) {
         a.href = URL.createObjectURL(blob);
         a.download = dateString + ".zip";
         a.click();
-        body.classList.remove("blurred");
+
+        for (let i = 0; i < logos.length; i++) {
+            const logo = logos[i];
+            logo.classList.remove("blurred");
+            const wrapper = wrappers[i];
+            wrapper.classList.remove("blurred");
+        }
         loading.remove();
     }).catch(err => alert(err));
 }
