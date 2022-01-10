@@ -33,6 +33,8 @@ func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
+	r.Body.Close()
+
 	//32 << 20 =  32 MB
 	r.ParseMultipartForm(32 << 20) // limit your max input length!
 
@@ -154,6 +156,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/png")
 		png.Encode(w, result)
 	}
+
 }
 
 func main() {

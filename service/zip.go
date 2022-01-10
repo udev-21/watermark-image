@@ -22,6 +22,7 @@ type order struct {
 }
 
 func FrontHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	//200 << 20 =  200 MB
 	r.ParseMultipartForm(200 << 20) // limit your max input length!
 
