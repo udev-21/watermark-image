@@ -38,6 +38,7 @@ function createNewItem(id) {
 
 let loadBackground = function (event) {
     let outerWrapper = document.getElementById('wrappers');
+    document.getElementById("opacity").value = "128";
 
     const windowwidth = window.screen.availWidth
     const windowheight = window.screen.availHeight
@@ -74,22 +75,24 @@ let loadBackground = function (event) {
         }
         outerWrapper.appendChild(item)
     }
+    setTimeout(loadLogo, 100);
     return
 };
 
 let loadLogo = function (event) {
-    logoFile = event.target.files[0];
+    // logoFile = event.target.files[0];
+    logoUrl = "/logo.png";
 
     let wrappers = document.getElementsByClassName("wrapper");
 
     for (let i = 0; i < wrappers.length; i++) {
         const element = wrappers[i];
-        let background = element.firstChild;
+        let background = document.getElementById("background" + i);
         let logo = background.nextSibling;
-        logo.src = URL.createObjectURL(logoFile);
+        logo.src = logoUrl;
         let backgroundScale = Math.min(background.height / background.naturalHeight, background.width / background.naturalWidth);
         let logoscale = logo.nextSibling.nextSibling.firstChild.nextSibling;
-
+        console.log(background);
         logo.onload = function () {
             URL.revokeObjectURL(logo.src)
             if (this.naturalHeight > background.naturalHeight || this.naturalWidth > background.naturalWidth) {
@@ -230,7 +233,7 @@ let onButtonClick = function (event) {
     loading.innerHTML = `<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>`;
     body.appendChild(loading);
 
-    formData.append('logo', logoFile);
+    // formData.append('logo', logoFile);
     fetch("/watermark-zip", {
         method: 'post',
         body: formData,
@@ -310,7 +313,7 @@ function onInputRangeSlider() {
     }
 }
 
-function onChangeLogoPositionStr1() {
+function onChangeLogoPositionStr() {
     console.log("onChangeLogoPositionStr");
     let logos = document.getElementsByClassName("logo");
     const positionStr = document.getElementById("logoPositionStr").value;

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"pimage/service"
 	"strconv"
 
@@ -37,25 +38,16 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	//32 << 20 =  32 MB
 	r.ParseMultipartForm(32 << 20) // limit your max input length!
 
-	logoFile, logoFileHeader, err := r.FormFile("logo")
+	pwd, _ := os.Getwd()
+	logoFile, err := os.Open(path.Join(pwd, "front/logo.png"))
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, `{"error": "logo - png file required"}`)
-		fmt.Println(err)
+		fmt.Fprintf(w, `{"error": "logo - file doesn't exist"}`)
 		return
 	}
-
-	logoContentType := logoFileHeader.Header.Get("Content-Type")
-	if logoContentType != "image/png" {
-		//set header to json
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, `{"error": "logo - must be a png image"}`)
-		return
-	}
-
 	defer logoFile.Close()
+
 	imageFile, imageFileHeader_, err := r.FormFile("image")
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
