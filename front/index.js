@@ -179,8 +179,10 @@ let loadLogo = function (event) {
             } else {
                 logo.width = Math.trunc(logo.naturalWidth * backgroundScale * this.value / 100);
                 logo.height = Math.trunc(logo.naturalHeight * backgroundScale * this.value / 100);
+                onChangeLogoPositionStr();
             }
             this.oldvalue = this.value;
+
         }
     }
     return
@@ -314,7 +316,6 @@ function onInputRangeSlider() {
 }
 
 function onChangeLogoPositionStr() {
-    console.log("onChangeLogoPositionStr");
     let logos = document.getElementsByClassName("logo");
     const positionStr = document.getElementById("logoPositionStr").value;
     for (let i = 0; i < logos.length; i++) {
