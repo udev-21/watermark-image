@@ -13,6 +13,8 @@ function createNewItem(id) {
     wrapper.classList.add("wrapper");
     let background = new Image();
     background.draggable = false;
+    background.id = "background" + id;
+    background.setAttribute("data-id", id);
 
     let logo = new Image();
     logo.style.opacity = "0.5";
@@ -20,6 +22,7 @@ function createNewItem(id) {
     logo.style.position = "absolute";
     logo.draggable = false;
     logo.id = "logo" + id;
+    logo.setAttribute("data-id", id);
 
     let logoscaleLabel = document.createElement('label');
     let logoscale = document.createElement('input');
@@ -30,19 +33,6 @@ function createNewItem(id) {
     wrapper.appendChild(document.createElement("br"));
     wrapper.appendChild(logoscaleLabel);
 
-    let rangeSlider = document.createElement('input');
-    rangeSlider.type = "range";
-    rangeSlider.min = "1";
-    rangeSlider.max = "255";
-    rangeSlider.value = "128";
-    rangeSlider.classList.add("slider");
-    rangeSlider.id = "slider" + id;
-    rangeSlider.classList.add("opacity");
-    rangeSlider.oninput = function () {
-        logo.style.opacity = rangeSlider.value / 256;
-    };
-    wrapper.appendChild(document.createElement("br"));
-    wrapper.appendChild(rangeSlider);
     return wrapper;
 }
 
@@ -197,7 +187,9 @@ let loadLogo = function (event) {
 let onButtonClick = function (event) {
     let formData = new FormData();
 
-    let wrappers = document.getElementsByClassName("wrapper")
+    let wrappers = document.getElementsByClassName("wrapper");
+    let opacity = document.getElementById("opacity").value;
+
     for (let i = 0; i < wrappers.length; i++) {
         const wrapper = wrappers[i];
         const background = wrapper.firstChild;
@@ -211,7 +203,6 @@ let onButtonClick = function (event) {
             logo = background.nextSibling;
             logoscale = logo.nextSibling.nextSibling.lastChild;
         }
-        let opacity = logoscale.parentElement.nextSibling.nextSibling.value;
 
         const logoTmp = logo.getBoundingClientRect();
         const backgroundTmp = background.getBoundingClientRect();
@@ -224,14 +215,14 @@ let onButtonClick = function (event) {
         formData.append('scale', logoscale.value);
         formData.append('image', backgroundFiles[i]);
         formData.append('opacity', opacity);
-        wrapper.classList.add("blurred");
+        // wrapper.classList.add("blurred");
     }
 
-    const logos = document.getElementsByClassName("logo");
-    for (let i = 0; i < logos.length; i++) {
-        const logo = logos[i];
-        logo.classList.add("blurred");
-    }
+    // const logos = document.getElementsByClassName("logo");
+    // for (let i = 0; i < logos.length; i++) {
+    //     const logo = logos[i];
+    //     logo.classList.add("blurred");
+    // }
 
     let body = document.getElementById("body");
     let loading = document.createElement('div');
@@ -256,12 +247,12 @@ let onButtonClick = function (event) {
                 a.download = dateString + ".zip";
                 a.click();
 
-                for (let i = 0; i < logos.length; i++) {
-                    const logo = logos[i];
-                    logo.classList.remove("blurred");
-                    const wrapper = wrappers[i];
-                    wrapper.classList.remove("blurred");
-                }
+                // for (let i = 0; i < logos.length; i++) {
+                //     const logo = logos[i];
+                //     logo.classList.remove("blurred");
+                //     const wrapper = wrappers[i];
+                //     wrapper.classList.remove("blurred");
+                // }
                 loading.remove();
             });
         } else {
@@ -308,4 +299,52 @@ function onLogin(event) {
             alert("wrong nickname or password");
         }
     })
+}
+
+function onInputRangeSlider() {
+    let logos = document.getElementsByClassName("logo");
+    const opacity = document.getElementById("opacity").value;
+    for (let i = 0; i < logos.length; i++) {
+        const logo = logos[i];
+        logo.style.opacity = opacity / 256;
+    }
+}
+
+function onChangeLogoPositionStr1() {
+    console.log("onChangeLogoPositionStr");
+    let logos = document.getElementsByClassName("logo");
+    const positionStr = document.getElementById("logoPositionStr").value;
+    for (let i = 0; i < logos.length; i++) {
+        const logo = logos[i];
+
+        let background = document.getElementById("background" + logo.getAttribute("data-id"));
+
+
+        // if (logo.getBoundingClientRect().right > background.getBoundingClientRect().right) {
+        //     logo.style.left = background.getBoundingClientRect().right - logo.getBoundingClientRect().width + 'px';
+        // }
+        // if (logo.getBoundingClientRect().left < background.getBoundingClientRect().left) {
+        //     logo.style.left = background.getBoundingClientRect().left + 'px';
+        // }
+        // if (logo.offsetTop + logo.offsetHeight > background.offsetTop + background.offsetHeight) {
+        //     logo.style.top = background.offsetHeight - logo.getBoundingClientRect().height + background.offsetTop + 'px';
+        // }
+        // if (logo.offsetTop < background.offsetTop) {
+        //     logo.style.top = background.offsetTop + 'px';
+        // }
+
+        if (positionStr == "TopLeft") {
+            logo.style.top = background.offsetTop + 'px';
+            logo.style.left = background.getBoundingClientRect().left + 'px';
+        } else if (positionStr == "TopRight") {
+            logo.style.top = background.offsetTop + 'px';
+            logo.style.left = background.getBoundingClientRect().right - logo.getBoundingClientRect().width + 'px';
+        } else if (positionStr == "BottomLeft") {
+            logo.style.top = background.offsetHeight - logo.getBoundingClientRect().height + background.offsetTop + 'px';
+            logo.style.left = background.offsetLeft + 'px';
+        } else if (positionStr == "BottomRight") {
+            logo.style.top = background.offsetHeight - logo.getBoundingClientRect().height + background.offsetTop + 'px';
+            logo.style.left = background.getBoundingClientRect().right - logo.getBoundingClientRect().width + 'px';
+        }
+    }
 }
