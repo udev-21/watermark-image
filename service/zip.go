@@ -155,7 +155,7 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		order.posX = int(posx)
-		posy, err := strconv.ParseInt(posXes[idx], 10, 64)
+		posy, err := strconv.ParseInt(posYes[idx], 10, 64)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
