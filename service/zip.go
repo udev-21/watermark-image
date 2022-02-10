@@ -28,13 +28,6 @@ func FrontHandler(w http.ResponseWriter, r *http.Request) {
 	//200 << 20 =  200 MB
 	r.ParseMultipartForm(200 << 20) // limit your max input length!
 
-	// logoFile, logoFileHeader, err := r.FormFile("logo")
-	// if err != nil {
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	fmt.Fprintf(w, `{"error": "logo - png file required"}`)
-	// 	return
-	// }
 	pwd, _ := os.Getwd()
 	logoFile, err := os.Open(path.Join(pwd, "front/logo.png"))
 	if err != nil {

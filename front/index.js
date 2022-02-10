@@ -179,7 +179,6 @@ let loadLogo = function (event) {
             } else {
                 logo.width = Math.trunc(logo.naturalWidth * backgroundScale * this.value / 100);
                 logo.height = Math.trunc(logo.naturalHeight * backgroundScale * this.value / 100);
-                onChangeLogoPositionStr();
             }
             this.oldvalue = this.value;
 

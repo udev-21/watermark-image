@@ -37,7 +37,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	//32 << 20 =  32 MB
 	r.ParseMultipartForm(32 << 20) // limit your max input length!
-
+	log.Printf("%#v", r.MultipartForm)
 	pwd, _ := os.Getwd()
 	logoFile, err := os.Open(path.Join(pwd, "front/logo.png"))
 	if err != nil {
@@ -148,7 +148,6 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/png")
 		png.Encode(w, result)
 	}
-
 }
 
 var (
